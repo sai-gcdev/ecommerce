@@ -31,7 +31,15 @@
   <div class="container">
     <form id="checkoutForm">
       <label>Shipping Address: <input type="text" required></label>
-      <label>Payment Method: <input type="text" required></label>
+      <label>Payment Method:
+        <select required>
+          <option value="" disabled selected>Select a payment method</option>
+          <option value="credit_card">Credit Card</option>
+          <option value="debit_card">Debit Card</option>
+          <option value="UPI">UPI</option>
+          <option value="COD">Cash on Delivery</option>
+        </select>
+      </label>
       <label>Voucher Code: <input type="text" placeholder="Optional"></label>
       <button type="submit" class="primary">Place Order</button>
       <button type="button" class="secondary" onclick="location.href='cart.html'">Cancel</button>
