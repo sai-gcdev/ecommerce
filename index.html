@@ -88,6 +88,16 @@
       deploymentId: 'f813f27a-0633-4d16-9834-9e4f9caec502'
     });
   </script>
+  <script type="text/javascript">
+    Genesys("command", "Journey.pageview", {
+      pageTitle: "Home Page",
+      pageLocation: window.location.href,
+      customAttributes: { 
+        timestamp: new Date().toISOString() // Add the current timestamp in ISO format
+      },
+      traitsMapper: []
+    });
+  </script>
 </head>
 <body>
   <header>
