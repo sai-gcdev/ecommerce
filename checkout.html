@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout</title>
+  <style>
+    body { font-family: Arial; background: #f9f9f9; margin: 0; }
+    header { background: #333; color: white; padding: 1rem; text-align: center; }
+    nav { background-color: #555; display: flex; justify-content: center; padding: 0.5rem; }
+    nav a { color: white; margin: 0 1rem; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    .container { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 1rem; }
+    input { width: 100%; padding: 0.5rem; margin-top: 0.3rem; }
+    button { margin-top: 1.5rem; padding: 0.7rem 1.5rem; font-size: 1rem; }
+    .primary { background: green; color: white; border: none; border-radius: 5px; }
+    .secondary { background: red; color: white; border: none; border-radius: 5px; margin-left: 1rem; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Checkout</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+
+  <div class="container">
+    <form id="checkoutForm">
+      <label>Shipping Address: <input type="text" required></label>
+      <label>Payment Method: <input type="text" required></label>
+      <label>Voucher Code: <input type="text" placeholder="Optional"></label>
+      <button type="submit" class="primary">Place Order</button>
+      <button type="button" class="secondary" onclick="location.href='cart.html'">Cancel</button>
+    </form>
+    <div id="confirmation" style="display:none; text-align:center; margin-top: 2rem;">
+      <h2>Order Placed Successfully!</h2>
+      <p>Thank you for your purchase.</p>
+      <a href="index.html">Back to Home</a>
+    </div>
+  </div>
+
+  <script>
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+      alert("Cart is empty. Redirecting to Home.");
+      location.href = "index.html";
+    }
+
+    document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      localStorage.removeItem("cart");
+      this.style.display = "none";
+      document.getElementById("confirmation").style.display = "block";
+    });
+  </script>
+</body>
+</html>

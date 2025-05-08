@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cart</title>
+  <style>
+    body { font-family: Arial; background: #f0f0f0; margin: 0; }
+    header { background: #333; color: white; padding: 1rem; text-align: center; }
+    nav { background-color: #555; display: flex; justify-content: center; padding: 0.5rem; }
+    nav a { color: white; margin: 0 1rem; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
+    .container { max-width: 900px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .item { display: flex; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #ddd; padding-bottom: 1rem; }
+    .item img { width: 100px; height: 100px; object-fit: cover; border-radius: 6px; }
+    .item-name { flex: 1; margin-left: 1rem; font-size: 1.1rem; }
+    .remove-btn { background: red; color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; border-radius: 5px; }
+    .total-section { text-align: right; margin-top: 1rem; }
+    #checkoutBtn { padding: 0.7rem 1.2rem; font-size: 1rem; background: green; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 1rem; }
+    #checkoutBtn:disabled { background: #999; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Your Cart</h1>
+  </header>
+
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="cart.html">Cart</a>
+  </nav>
+
+  <div class="container">
+    <div id="cartItems"></div>
+
+    <div class="total-section">
+      <h2>Total: ₹<span id="totalPrice">0</span></h2>
+      <button id="checkoutBtn" disabled onclick="location.href='checkout.html'">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    const products = [
+      { id: 1, name: "Wireless Headphones", price: 1999, image: "https://www.boat-lifestyle.com/cdn/shop/files/ACCH3Y28FFJY6QRH_0_1500x.png?v=1737717888" },
+      { id: 2, name: "Running Shoes", price: 4499, image: "https://static.nike.com/a/images/w_1920,c_limit/ea377fea-17a1-4e20-a5b3-1842a8a1f22a/nike-adds-visible-air-zoom-unit-in-creation-of-pegasus-premium.jpg" },
+      { id: 3, name: "Smart Watch", price: 2999, image: "https://rukminim2.flixcart.com/image/850/1000/xif0q/shopsy-smartwatch/p/b/6/1-44-android-ios-t500-smart-watch-with-bluetooth-calling-black-original-imagvy24hyyqbzvm.jpeg?q=90&crop=false" },
+      { id: 4, name: "Leather Wallet", price: 799, image: "https://cdn.pixabay.com/photo/2014/10/19/11/10/purse-494169_640.jpg" },
+      { id: 5, name: "Sunglasses", price: 1499, image: "https://royalson.in/wp-content/uploads/2020/04/1-14-scaled.jpg" },
+      { id: 6, name: "Backpack", price: 2499, image: "https://icon.in/cdn/shop/files/1_f4e239e5-e089-4185-98fd-8fd7238275fe.jpg?v=1735286514" }
+    ];
+
+    const cartContainer = document.getElementById("cartItems");
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    function renderCart() {
+      cartContainer.innerHTML = "";
+      let total = 0;
+
+      if (cart.length === 0) {
+        cartContainer.innerHTML = "<p>Your cart is empty.</p>";
+        document.getElementById("checkoutBtn").disabled = true;
+        document.getElementById("totalPrice").innerText = 0;
+        return;
+      }
+
+      cart.forEach(id => {
+        const product = products.find(p => p.id === id);
+        total += product.price;
+
+        const item = document.createElement("div");
+        item.className = "item";
+        item.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <div class="item-name">${product.name}<br><strong>₹${product.price}</strong></div>
+          <button class="remove-btn" onclick="removeFromCart(${id})">Remove</button>
+        `;
+        cartContainer.appendChild(item);
+      });
+
+      document.getElementById("totalPrice").innerText = total;
+      document.getElementById("checkoutBtn").disabled = false;
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(item => item !== id);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      renderCart();
+    }
+
+    renderCart();
+  </script>
+</body>
+</html>
