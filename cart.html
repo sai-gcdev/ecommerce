@@ -34,14 +34,14 @@
   </script>
   <script type="text/javascript">
     Genesys("command", "Journey.pageview", {
-      pageTitle: "Cart Page",
+      pageTitle: document.title,
       pageLocation: window.location.href,
       customAttributes: { 
-        timestamp: new Date().toISOString() // Add the current timestamp in ISO format
+        visitTimestamp: new Date().toISOString()
       },
       traitsMapper: []
     });
-  </script>
+  </script>  
 </head>
 <body>
 

@@ -19,6 +19,16 @@
       deploymentId: 'f813f27a-0633-4d16-9834-9e4f9caec502'
     });
   </script>
+  <script type="text/javascript">
+    Genesys("command", "Journey.pageview", {
+      pageTitle: document.title,
+      pageLocation: window.location.href,
+      customAttributes: {
+        visitTimestamp: new Date().toISOString()
+      },
+      traitsMapper: []
+    });
+  </script
 </head>
 <body>
   <h2>Login</h2>
