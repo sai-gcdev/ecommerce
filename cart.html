@@ -106,9 +106,25 @@
     }
 
     function removeFromCart(id) {
+      // Find the product details
+      const product = products.find(p => p.id === id);
+
+      // Remove the product from the cart
       cart = cart.filter(item => item !== id);
       localStorage.setItem("cart", JSON.stringify(cart));
       renderCart();
+
+       // Track the product removal using Genesys Journey.record
+      Genesys("command", "Journey.record", {
+        eventName: "product_removed",
+        customAttributes: {
+          removedFromCart: true,
+          price: product.price,
+          code: `PROD-${product.id}`,
+          name: product.name
+        },
+        traitsMapper: []
+      });
     }
 
     renderCart();
