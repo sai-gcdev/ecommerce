@@ -107,13 +107,8 @@
         Genesys("command", "Journey.record", {
           eventName: "order_placed",
           customAttributes: {
-            orderTotal: totalAmount,
-            productCount: productsInCart.length,
-            products: productsInCart.map(product => ({
-              id: product.id,
-              name: product.name,
-              price: product.price
-            }))
+            orderplaced: true,
+            productCount: productsInCart.length
           },
           traitsMapper: []
         });
