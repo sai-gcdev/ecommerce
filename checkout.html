@@ -88,6 +88,21 @@
     document.getElementById("checkoutForm").addEventListener("submit", function (e) {
       e.preventDefault();
       console.log("Place Order button clicked");
+      // Track the successful order using Genesys Journey.record
+      Genesys("command", "Journey.record", {
+        eventName: "order_placed",
+        customAttributes: {
+          orderTotal: totalAmount,
+          productCount: productsInCart.length,
+          products: productsInCart.map(product => ({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            orderplaced: true
+          }))
+        },
+        traitsMapper: []
+      });
   
       // Retrieve cart data
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -105,22 +120,6 @@
       // Hide the form and show the confirmation message
       this.style.display = "none";
       document.getElementById("confirmation").style.display = "block";
-  
-      // Track the successful order using Genesys Journey.record
-      Genesys("command", "Journey.record", {
-        eventName: "order_placed",
-        customAttributes: {
-          orderTotal: totalAmount,
-          productCount: productsInCart.length,
-          products: productsInCart.map(product => ({
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            orderplaced: true
-          }))
-        },
-        traitsMapper: []
-      });
     });
   </script>
 </body>
