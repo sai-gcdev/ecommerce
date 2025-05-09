@@ -154,6 +154,19 @@
       cart.push(id);
       localStorage.setItem("cart", JSON.stringify(cart));
       //alert("Item added to cart!");
+      const product = products.find(p => p.id === id);
+
+      Genesys("command", "Journey.record", {
+      eventName: "product_added",
+      customAttributes: {
+        addedToCart: true,
+        price: product.price,
+        code: `PROD-${product.id}`,
+        name: product.name
+      },
+      traitsMapper: []
+    });
+
     }
 
     searchBox.addEventListener("input", function () {
