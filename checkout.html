@@ -76,11 +76,26 @@
   </div>
 
   <script>
+    const products = [
+      { id: 1, name: "Wireless Headphones", price: 1999 },
+      { id: 2, name: "Running Shoes", price: 4499 },
+      { id: 3, name: "Smart Watch", price: 2999 },
+      { id: 4, name: "Leather Wallet", price: 799 },
+      { id: 5, name: "Sunglasses", price: 1499 },
+      { id: 6, name: "Backpack", price: 2499 }
+    ];
+  
     document.getElementById("checkoutForm").addEventListener("submit", function (e) {
       e.preventDefault();
+      console.log("Place Order button clicked");
   
       // Retrieve cart data
       const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+  
       const productsInCart = cart.map(id => products.find(p => p.id === id));
       const totalAmount = productsInCart.reduce((sum, product) => sum + product.price, 0);
   
