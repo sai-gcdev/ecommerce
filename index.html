@@ -23,6 +23,20 @@
       border-radius: 5px;
     }
 
+    .search-bar button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .search-bar button:hover {
+      background: #0056b3;
+    }
+
     .container {
       max-width: 1000px;
       margin: 2rem auto;
@@ -112,6 +126,7 @@
 
   <div class="search-bar">
     <input type="text" id="searchBox" placeholder="Search products...">
+    <button onclick="searchProducts()">🔍 Search</button>
   </div>
 
   <main class="container" id="productContainer"></main>
@@ -153,27 +168,35 @@
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
       cart.push(id);
       localStorage.setItem("cart", JSON.stringify(cart));
-      //alert("Item added to cart!");
       const product = products.find(p => p.id === id);
 
       Genesys("command", "Journey.record", {
-      eventName: "product_added",
-      customAttributes: {
-        addedToCart: true,
-        price: product.price,
-        code: `PROD-${product.id}`,
-        name: product.name
-      },
-      traitsMapper: []
-    });
-
+        eventName: "product_added",
+        customAttributes: {
+          addedToCart: true,
+          price: product.price,
+          code: `PROD-${product.id}`,
+          name: product.name
+        },
+        traitsMapper: []
+      });
     }
 
-    searchBox.addEventListener("input", function () {
-      const keyword = this.value.toLowerCase();
+    function searchProducts() {
+      const keyword = searchBox.value.toLowerCase();
       const filtered = products.filter(p => p.name.toLowerCase().includes(keyword));
       renderProducts(filtered);
-    });
+
+      // Track the search term using Genesys
+      Genesys("command", "Journey.record", {
+        eventName: "search_performed",
+        customAttributes: {
+          searchTerm: keyword,
+          resultsFound: filtered.length
+        },
+        traitsMapper: []
+      });
+    }
 
     renderProducts(products);
 
