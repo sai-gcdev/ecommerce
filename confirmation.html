@@ -126,9 +126,15 @@
       `;
       document.getElementById('confirmationContainer').innerHTML = html;
 
+      // Debug logs
+      console.log("Order ID:", orderId);
+      console.log("Delivery Date:", deliveryDate);
+      console.log("Ordered Products:", orderedProducts);
+      console.log("Total:", total);
+
       // Send PurchaseCompleted event to Genesys Cloud for each product
       orderedProducts.forEach(p => {
-        Genesys("command", "Journey.record", {
+        const eventData = {
           eventName: "purchase_completed",
           customAttributes: {
             orderId: orderId,
@@ -140,7 +146,9 @@
             productQuantity: p.quantity
           },
           traitsMapper: []
-        });
+        };
+        console.log("Sending Genesys event:", eventData);
+        Genesys("command", "Journey.record", eventData);
       });
 
       // Optionally clear cart after order
