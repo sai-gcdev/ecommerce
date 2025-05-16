@@ -35,7 +35,7 @@
       pageTitle: document.title,
       pageLocation: window.location.href,
       customAttributes: { 
-        visitTimestamp: new Date().toISOString() // Renamed and still string
+        visitTimestamp: new Date().toISOString()
       },
       traitsMapper: []
     });
@@ -68,11 +68,6 @@
       <button type="submit" class="primary">Place Order</button>
       <button type="button" class="secondary" onclick="location.href='cart.html'">Cancel</button>
     </form>
-    <div id="confirmation" style="display:none; text-align:center; margin-top: 2rem;">
-      <h2>Order Placed Successfully!</h2>
-      <p>Thank you for your purchase.</p>
-      <a href="index.html">Back to Home</a>
-    </div>
   </div>
 
   <script>
@@ -88,30 +83,14 @@
   
       document.getElementById("checkoutForm").addEventListener("submit", function (e) {
         e.preventDefault();
-        console.log("Place Order button clicked");
-  
         const cart = JSON.parse(localStorage.getItem("cart")) || [];
         if (cart.length === 0) {
           alert("Your cart is empty!");
           return;
         }
-  
-        const productsInCart = cart.map(id => products.find(p => p.id === id));
-        const totalAmount = productsInCart.reduce((sum, product) => sum + product.price, 0);
-  
-        localStorage.removeItem("cart");
-        this.style.display = "none";
-        document.getElementById("confirmation").style.display = "block";
-  
-        // Track the successful order using Genesys Journey.record
-        Genesys("command", "Journey.record", {
-          eventName: "order_placed",
-          customAttributes: {
-            orderplaced: true,
-            productCount: productsInCart.length
-          },
-          traitsMapper: []
-        });
+        // Optionally, you can store order info in localStorage/sessionStorage if needed
+        // Redirect to confirmation page
+        window.location.href = "confirmation.html";
       });
     });
   </script>
