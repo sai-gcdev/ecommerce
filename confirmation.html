@@ -4,10 +4,49 @@
   <meta charset="UTF-8" />
   <title>Order Confirmation</title>
   <style>
-    body { font-family: Arial; background: #f0f0f0; text-align: center; padding: 4rem; }
-    .box { background: white; padding: 3rem; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h1 { color: #28a745; }
-    button { margin-top: 2rem; padding: 1rem 2rem; background: #007bff; color: white; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; }
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: #333; color: #fff; padding: 1rem; text-align: center; }
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 2rem;
+      text-align: center;
+    }
+    .order-id {
+      font-size: 1.2rem;
+      color: #007bff;
+      margin-bottom: 1rem;
+    }
+    .delivery-date {
+      color: #28a745;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+    .products-list {
+      text-align: left;
+      margin: 1.5rem 0;
+    }
+    .products-list li {
+      margin-bottom: 0.7rem;
+      padding-bottom: 0.7rem;
+      border-bottom: 1px solid #eee;
+    }
+    .back-btn {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 2rem;
+    }
+    .back-btn:hover {
+      background: #0056b3;
+    }
   </style>
   <script type="text/javascript" charset="utf-8">
     (function (g, e, n, es, ys) {
@@ -23,22 +62,92 @@
       deploymentId: 'f813f27a-0633-4d16-9834-9e4f9caec502'
     });
   </script>
-  <script type="text/javascript">
-    Genesys("command", "Journey.pageview", {
-      pageTitle: document.title,
-      pageLocation: window.location.href,
-      customAttributes: { 
-        visitTimestamp: new Date().toISOString() // Renamed and still string
-      },
-      traitsMapper: []
-    });
-  </script>
 </head>
 <body>
-  <div class="box">
-    <h1>🎉 Order Placed Successfully!</h1>
-    <p>Thank you for shopping with us. We’ll notify you once your order is shipped.</p>
-    <button onclick="location.href='index.html'">Return to Home</button>
+  <header>
+    <h1>Order Confirmation</h1>
+  </header>
+  <div class="container" id="confirmationContainer">
+    <!-- Order details will be rendered here -->
   </div>
+  <script>
+    // Product data (should match your main product list)
+    const products = [
+      { id: 1, name: "Wireless Headphones", price: 1999 },
+      { id: 2, name: "Running Shoes", price: 4499 },
+      { id: 3, name: "Smart Watch", price: 2999 },
+      { id: 4, name: "Leather Wallet", price: 799 },
+      { id: 5, name: "Sunglasses", price: 1499 },
+      { id: 6, name: "Backpack", price: 2499 }
+    ];
+
+    // Generate random order ID
+    function generateOrderId() {
+      return 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+    }
+
+    // Get estimated delivery date (4 days from now)
+    function getDeliveryDate() {
+      const date = new Date();
+      date.setDate(date.getDate() + 4);
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    // Get cart from localStorage
+    function getOrderedProducts() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      // Count quantities
+      const counts = {};
+      cart.forEach(id => counts[id] = (counts[id] || 0) + 1);
+      // Map to product objects with quantity
+      return Object.entries(counts).map(([id, qty]) => {
+        const prod = products.find(p => p.id == id);
+        return prod ? { ...prod, quantity: qty } : null;
+      }).filter(Boolean);
+    }
+
+    // Render confirmation
+    function renderConfirmation() {
+      const orderId = generateOrderId();
+      const deliveryDate = getDeliveryDate();
+      const orderedProducts = getOrderedProducts();
+      const total = orderedProducts.reduce((sum, p) => sum + p.price * p.quantity, 0);
+
+      let html = `
+        <div class="order-id">Order ID: <strong>${orderId}</strong></div>
+        <div class="delivery-date">Estimated Delivery: ${deliveryDate}</div>
+        <h2>Thank you for your purchase!</h2>
+        <h3>Products Ordered:</h3>
+        <ul class="products-list">
+          ${orderedProducts.map(p => `<li>${p.name} (x${p.quantity}) - ₹${p.price * p.quantity}</li>`).join('')}
+        </ul>
+        <div style="font-weight:bold; margin-bottom:1.5rem;">Total: ₹${total}</div>
+        <button class="back-btn" onclick="window.location.href='index.html'">Back to Home</button>
+      `;
+      document.getElementById('confirmationContainer').innerHTML = html;
+
+      // Send PurchaseCompleted event to Genesys Cloud
+      Genesys("command", "Journey.record", {
+        eventName: "purchase_completed",
+        customAttributes: {
+          orderId: orderId,
+          total: total,
+          deliveryDate: deliveryDate,
+          products: orderedProducts.map(p => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            quantity: p.quantity
+          }))
+        },
+        traitsMapper: []
+      });
+
+      // Optionally clear cart after order
+      localStorage.removeItem("cart");
+    }
+
+    renderConfirmation();
+  </script>
 </body>
 </html>
