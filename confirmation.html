@@ -126,21 +126,21 @@
       `;
       document.getElementById('confirmationContainer').innerHTML = html;
 
-      // Send PurchaseCompleted event to Genesys Cloud
-      Genesys("command", "Journey.record", {
-        eventName: "purchase_completed",
-        customAttributes: {
-          orderId: orderId,
-          total: total,
-          deliveryDate: deliveryDate,
-          products: JSON.stringify(orderedProducts.map(p => ({
-            id: p.id,
-            name: p.name,
-            price: p.price,
-            quantity: p.quantity
-          })))
-        },
-        traitsMapper: []
+      // Send PurchaseCompleted event to Genesys Cloud for each product
+      orderedProducts.forEach(p => {
+        Genesys("command", "Journey.record", {
+          eventName: "purchase_completed",
+          customAttributes: {
+            orderId: orderId,
+            total: total,
+            deliveryDate: deliveryDate,
+            productId: p.id,
+            productName: p.name,
+            productPrice: p.price,
+            productQuantity: p.quantity
+          },
+          traitsMapper: []
+        });
       });
 
       // Optionally clear cart after order
