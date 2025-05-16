@@ -52,6 +52,12 @@
       padding: 1rem;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       text-align: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+
+    .product:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
     }
 
     .product img {
@@ -59,15 +65,18 @@
       height: 180px;
       object-fit: cover;
       border-radius: 5px;
+      pointer-events: none;
     }
 
     .product h3 {
       margin: 0.5rem 0 0.2rem;
+      pointer-events: none;
     }
 
     .product p {
       margin: 0.2rem 0 1rem;
       font-weight: bold;
+      pointer-events: none;
     }
 
     .product button {
@@ -77,10 +86,70 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      pointer-events: auto;
     }
 
     .product button:hover {
       background: #218838;
+    }
+
+    /* Popup styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      margin: auto;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      animation: fadeIn 0.2s;
+    }
+
+    @keyframes fadeIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      font-size: 1.5rem;
+      color: #888;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .close:hover {
+      color: #333;
+    }
+    .modal-content img {
+      max-width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+    }
+    .modal-content h3 {
+      margin: 0.5rem 0 0.2rem;
+    }
+    .modal-content p {
+      margin: 0.2rem 0 1rem;
+      font-weight: bold;
     }
   </style>
   <script>
@@ -107,7 +176,7 @@
       pageTitle: document.title,
       pageLocation: window.location.href,
       customAttributes: { 
-        visitTimestamp: new Date().toISOString() // Renamed and still string
+        visitTimestamp: new Date().toISOString()
       },
       traitsMapper: []
     });
@@ -131,18 +200,28 @@
 
   <main class="container" id="productContainer"></main>
 
+  <!-- Product Details Popup Modal -->
+  <div id="productModal" class="modal">
+    <div class="modal-content" id="modalContent">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <!-- Product details will be injected here -->
+    </div>
+  </div>
+
   <script>
     const products = [
-      { id: 1, name: "Wireless Headphones", price: 1999, image: "https://www.boat-lifestyle.com/cdn/shop/files/ACCH3Y28FFJY6QRH_0_1500x.png?v=1737717888" },
-      { id: 2, name: "Running Shoes", price: 4499, image: "https://static.nike.com/a/images/w_1920,c_limit/ea377fea-17a1-4e20-a5b3-1842a8a1f22a/nike-adds-visible-air-zoom-unit-in-creation-of-pegasus-premium.jpg" },
-      { id: 3, name: "Smart Watch", price: 2999, image: "https://rukminim2.flixcart.com/image/850/1000/xif0q/shopsy-smartwatch/p/b/6/1-44-android-ios-t500-smart-watch-with-bluetooth-calling-black-original-imagvy24hyyqbzvm.jpeg?q=90&crop=false" },
-      { id: 4, name: "Leather Wallet", price: 799, image: "https://cdn.pixabay.com/photo/2014/10/19/11/10/purse-494169_640.jpg" },
-      { id: 5, name: "Sunglasses", price: 1499, image: "https://royalson.in/wp-content/uploads/2020/04/1-14-scaled.jpg" },
-      { id: 6, name: "Backpack", price: 2499, image: "https://icon.in/cdn/shop/files/1_f4e239e5-e089-4185-98fd-8fd7238275fe.jpg?v=1735286514" }
+      { id: 1, name: "Wireless Headphones", price: 1999, image: "https://www.boat-lifestyle.com/cdn/shop/files/ACCH3Y28FFJY6QRH_0_1500x.png?v=1737717888", description: "High-quality wireless headphones with noise cancellation." },
+      { id: 2, name: "Running Shoes", price: 4499, image: "https://static.nike.com/a/images/w_1920,c_limit/ea377fea-17a1-4e20-a5b3-1842a8a1f22a/nike-adds-visible-air-zoom-unit-in-creation-of-pegasus-premium.jpg", description: "Comfortable and durable running shoes for all terrains." },
+      { id: 3, name: "Smart Watch", price: 2999, image: "https://rukminim2.flixcart.com/image/850/1000/xif0q/shopsy-smartwatch/p/b/6/1-44-android-ios-t500-smart-watch-with-bluetooth-calling-black-original-imagvy24hyyqbzvm.jpeg?q=90&crop=false", description: "Feature-rich smart watch with health tracking." },
+      { id: 4, name: "Leather Wallet", price: 799, image: "https://cdn.pixabay.com/photo/2014/10/19/11/10/purse-494169_640.jpg", description: "Premium leather wallet with multiple compartments." },
+      { id: 5, name: "Sunglasses", price: 1499, image: "https://royalson.in/wp-content/uploads/2020/04/1-14-scaled.jpg", description: "Stylish sunglasses with UV protection." },
+      { id: 6, name: "Backpack", price: 2499, image: "https://icon.in/cdn/shop/files/1_f4e239e5-e089-4185-98fd-8fd7238275fe.jpg?v=1735286514", description: "Spacious and sturdy backpack for daily use." }
     ];
 
     const container = document.getElementById("productContainer");
     const searchBox = document.getElementById("searchBox");
+    const modal = document.getElementById("productModal");
+    const modalContent = document.getElementById("modalContent");
 
     function renderProducts(list) {
       container.innerHTML = "";
@@ -158,8 +237,9 @@
           <img src="${p.image}" alt="${p.name}">
           <h3>${p.name}</h3>
           <p>₹${p.price}</p>
-          <button onclick="addToCart(${p.id})">Add to Cart</button>
+          <button onclick="event.stopPropagation(); addToCart(${p.id})">Add to Cart</button>
         `;
+        div.onclick = function() { showProductDetails(p.id); };
         container.appendChild(div);
       });
     }
@@ -197,6 +277,31 @@
         traitsMapper: []
       });
     }
+
+    function showProductDetails(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+      modalContent.innerHTML = `
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img src="${product.image}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        <p>₹${product.price}</p>
+        <p>${product.description || ""}</p>
+        <button onclick="addToCart(${product.id}); closeModal();">Add to Cart</button>
+      `;
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+
+    // Close modal when clicking outside content
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
 
     renderProducts(products);
 
