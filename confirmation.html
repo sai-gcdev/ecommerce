@@ -133,12 +133,12 @@
           orderId: orderId,
           total: total,
           deliveryDate: deliveryDate,
-          products: orderedProducts.map(p => ({
+          products: JSON.stringify(orderedProducts.map(p => ({
             id: p.id,
             name: p.name,
             price: p.price,
             quantity: p.quantity
-          }))
+          })))
         },
         traitsMapper: []
       });
